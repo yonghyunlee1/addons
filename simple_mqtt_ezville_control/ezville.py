@@ -411,7 +411,7 @@ def ezville_loop(config):
                                     
                                     # State 업데이트까지 진행
                                     onoff = 'ON' if int(packet[10 + 2 * id: 12 + 2 * id], 16) > 0 else 'OFF'
-                                    log('[YH] ->> light{}_{} onoff : {} packet[{}:{}][{}] raw:{} >> {} {}'.format(rid, id, onoff, 10 + 2 * id, 12 + 2 * id, int(packet[10 + 2 * id: 12 + 2 * id], 16), packet[10 + 2 * id: 12 + 2 * id]))
+                                    log('[YH] ->> light{}_{} onoff : {} packet[{}:{}][{}] >> {} {}'.format(rid, id, onoff, 10 + 2 * id, 12 + 2 * id, int(packet[10 + 2 * id: 12 + 2 * id], 16)))
 
                                     #디밍조명 예외처리 yh
                                     if rid == 1:
