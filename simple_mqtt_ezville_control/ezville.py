@@ -425,7 +425,7 @@ def ezville_loop(config):
                                         else: 
                                             onoff = 'OFF'
 
-                                    log('[YH] ->> onoff : {} [{}] >> {} {} %%% {}'.format(onoff, int(packet[10 + 2 * id: 12 + 2 * id], 16), rid, id, packet))
+                                    #log('[YH] ->> onoff : {} [{}] >> {} {} %%% {}'.format(onoff, int(packet[10 + 2 * id: 12 + 2 * id], 16), rid, id, packet))
                                         
                                     await update_state(name, 'power', rid, id, onoff)
                                     
