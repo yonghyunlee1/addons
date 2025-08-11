@@ -411,18 +411,18 @@ def ezville_loop(config):
                                     
                                     # State 업데이트까지 진행
                                     onoff = 'ON' if int(packet[10 + 2 * id: 12 + 2 * id], 16) > 0 else 'OFF'
-                                    log('[YH] ->> onoff : {} >> {} {}'.format(onoff, rid, id))
+                                    log('[YH] ->> onoff : {} [{}] >> {} {}'.format(onoff, int(packet[10 + 2 * id: 12 + 2 * id], 16), rid, id))
 
                                     #디밍조명 예외처리 yh
                                     if rid == 1:
                                         if id == 1 or id == 2:
-                                            log('[YH@@@] ->> onoff : {} >> {} {}'.format(onoff, rid, id))
+                                            log('[YH@@@] ->> onoff : {} [{}] >> {} {}'.format(onoff, int(packet[10 + 2 * id: 12 + 2 * id], 16), rid, id))
                                             if int(packet[10 + 2 * id: 12 + 2 * id], 16) > 2:
                                                 onoff = 'ON'
                                             else: 
                                                 onoff = 'OFF'
                                     elif rid == 2 or rid == 3 or rid == 4 or rid == 5:
-                                        log('[YH@@@] ->> onoff : {} >> {} {}'.format(onoff, rid, id))
+                                        log('[YH@@@] ->> onoff : {} [{}] >> {} {}'.format(onoff, int(packet[10 + 2 * id: 12 + 2 * id], 16), rid, id))
                                         if int(packet[10 + 2 * id: 12 + 2 * id], 16) > 2:
                                             onoff = 'ON'
                                         else: 
