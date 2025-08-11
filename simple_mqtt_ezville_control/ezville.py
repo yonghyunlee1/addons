@@ -417,13 +417,13 @@ def ezville_loop(config):
                                     if rid == 1:
                                         if id == 1 or id == 2:
                                             log('[YH@@@]')
-                                            if int(packet[10 + 2 * id: 12 + 2 * id], 16) > 2:
+                                            if int(packet[10 + 2 * id: 12 + 2 * id], 16) > 6:
                                                 onoff = 'ON'
                                             else: 
                                                 onoff = 'OFF'
                                     elif rid == 2 or rid == 3 or rid == 4 or rid == 5:
                                         log('[YH@@@]')
-                                        if int(packet[10 + 2 * id: 12 + 2 * id], 16) > 2:
+                                        if int(packet[10 + 2 * id: 12 + 2 * id], 16) > 6:
                                             onoff = 'ON'
                                         else: 
                                             onoff = 'OFF'
