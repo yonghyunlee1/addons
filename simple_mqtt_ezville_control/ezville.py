@@ -779,11 +779,14 @@ def ezville_loop(config):
                     sendcmd = checksum('F7' + RS485_DEVICE[device]['state']['id'] + '0' + str(idx) + RS485_DEVICE[device]['state']['cmd'] + '0300' + CMD + '000000')
                     recvcmd = 'NULL'
                     statcmd = [key, 'NULL']
+
+                    #0.1초 간격으로 10회 전송하도록 수정 yh
+                    for rid in range(1, 10):
+                        await CMD_QUEUE.put({'sendcmd': sendcmd, 'recvcmd': recvcmd, 'statcmd': statcmd})
                     
-                    await CMD_QUEUE.put({'sendcmd': sendcmd, 'recvcmd': recvcmd, 'statcmd': statcmd})
-                    
-                    if debug:
-                        log('[DEBUG] Queued ::: sendcmd: {}, recvcmd: {}, statcmd: {}'.format(sendcmd, recvcmd, statcmd))
+                        if debug:
+                            log('[DEBUG] Queued ::: sendcmd: {}, recvcmd: {}, statcmd: {}'.format(sendcmd, recvcmd, statcmd))
+                        await asyncio.sleep(0.1)
   
                                                 
     # HA에서 전달된 명령을 EW11 패킷으로 전송
