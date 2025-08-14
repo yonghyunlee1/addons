@@ -780,8 +780,8 @@ def ezville_loop(config):
                     recvcmd = 'NULL'
                     statcmd = [key, 'NULL']
 
-                    #0.15초 간격으로 30회 전송하도록 수정 yh
-                    for rid in range(1, 31):
+                    #0.15초 간격으로 20회 전송하도록 수정 yh
+                    for rid in range(1, 21):
                         await CMD_QUEUE.put({'sendcmd': sendcmd, 'recvcmd': recvcmd, 'statcmd': statcmd})
                     
                         if debug:
