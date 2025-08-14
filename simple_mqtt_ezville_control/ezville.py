@@ -780,13 +780,13 @@ def ezville_loop(config):
                     recvcmd = 'NULL'
                     statcmd = [key, 'NULL']
 
-                    #0.1초 간격으로 20회 전송하도록 수정 yh
-                    for rid in range(1, 20):
+                    #0.07초 간격으로 20회 전송하도록 수정 yh
+                    for rid in range(1, 21):
                         await CMD_QUEUE.put({'sendcmd': sendcmd, 'recvcmd': recvcmd, 'statcmd': statcmd})
                     
                         if debug:
                             log('[DEBUG] Queued ::: sendcmd: {}, recvcmd: {}, statcmd: {}'.format(sendcmd, recvcmd, statcmd))
-                        await asyncio.sleep(0.1)
+                        await asyncio.sleep(0.07)
   
                                                 
     # HA에서 전달된 명령을 EW11 패킷으로 전송
