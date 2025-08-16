@@ -37,7 +37,9 @@
     "reboot_control": false,
     "reboot_delay": 300,
     "ew11_buffer_size": 128,
-    "ew11_timeout": 3600
+    "ew11_timeout": 3600,
+    "elevator_call_delay": 0.1,
+    "elevator_call_cnt" : 10
   },
   "schema": {
     "DEBUG_LOG": "bool",
@@ -66,6 +68,9 @@
     "reboot_control": "bool",
     "reboot_delay": "float",
     "ew11_buffer_size": "int",
-    "ew11_timeout": "float"
+    "ew11_timeout": "float",
+    "elevator_call_delay": "float",
+    "elevator_call_cnt" : "int"
+
   }
 }
