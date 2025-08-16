@@ -257,6 +257,10 @@ def ezville_loop(config):
     REBOOT_CONTROL = config['reboot_control']
     REBOOT_DELAY = config['reboot_delay']
 
+    # elevator call 반복횟수 제어 yh
+    EVEVATOR_CALL_DELAY = config['elevator_call_delay']
+    EVEVATOR_CALL_cnt = config['elevator_call_cnt']
+    
     # 시작 시 인위적인 Delay 필요시 사용
     startup_delay = 0
   
@@ -780,13 +784,13 @@ def ezville_loop(config):
                     recvcmd = 'NULL'
                     statcmd = [key, 'NULL']
 
-                    #0.12초 간격으로 30회 전송하도록 수정 yh
-                    for rid in range(1, 31):
+                    #EVEVATOR_CALL_DELAY초 간격으로 EVEVATOR_CALL_CNT회 전송하도록 수정 yh
+                    for rid in range(1, EVEVATOR_CALL_CNT+1):
                         await CMD_QUEUE.put({'sendcmd': sendcmd, 'recvcmd': recvcmd, 'statcmd': statcmd})
                     
                         if debug:
                             log('[DEBUG] Queued ::: sendcmd: {}, recvcmd: {}, statcmd: {}'.format(sendcmd, recvcmd, statcmd))
-                        await asyncio.sleep(0.12)
+                        await asyncio.sleep(EVEVATOR_CALL_DELAY)
   
                                                 
     # HA에서 전달된 명령을 EW11 패킷으로 전송
