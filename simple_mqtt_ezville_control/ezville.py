@@ -259,7 +259,7 @@ def ezville_loop(config):
 
     # elevator call 반복횟수 제어 yh
     EVEVATOR_CALL_DELAY = config['elevator_call_delay']
-    EVEVATOR_CALL_cnt = config['elevator_call_cnt']
+    EVEVATOR_CALL_CNT = config['elevator_call_cnt']
     
     # 시작 시 인위적인 Delay 필요시 사용
     startup_delay = 0
