@@ -25,9 +25,11 @@ RS485_DEVICE = {
         'target':   { 'id': '36', 'cmd': '44', 'ack': 'C4' }
     },
     'plug': {
-        'state':    { 'id': '50', 'cmd': '81' },
+#        'state':    { 'id': '50', 'cmd': '81' },
+        'state':    { 'id': '39', 'cmd': '81' },
 
-        'power':    { 'id': '50', 'cmd': '43', 'ack': 'C3' }
+#        'power':    { 'id': '50', 'cmd': '43', 'ack': 'C3' }
+        'power':    { 'id': '39', 'cmd': '43', 'ack': 'C3' }
     },
     'gasvalve': {
         'state':    { 'id': '12', 'cmd': '81' },
