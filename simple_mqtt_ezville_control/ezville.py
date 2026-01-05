@@ -29,7 +29,7 @@ RS485_DEVICE = {
         'state':    { 'id': '39', 'cmd': '81' },
 
 #        'power':    { 'id': '50', 'cmd': '43', 'ack': 'C3' }
-        'power':    { 'id': '39', 'cmd': '43', 'ack': 'C3' }
+        'power':    { 'id': '39', 'cmd': '01', 'ack': 'C3' }
     },
     'gasvalve': {
         'state':    { 'id': '12', 'cmd': '81' },
