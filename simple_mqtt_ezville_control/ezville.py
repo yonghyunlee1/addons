@@ -487,6 +487,8 @@ def ezville_loop(config):
                                     MSG_CACHE['F7361F810F'] = packet[10:]
                                         
                             # plug는 ACK PACKET에 상태 정보가 없으므로 STATE_PACKET만 처리
+                            elif name == 'plug':
+                                log('[YH] ->> TEST : [{}]'.format(packet))
                             elif name == 'plug' and STATE_PACKET:
                                 if STATE_PACKET:
                                     # ROOM ID
