@@ -490,7 +490,7 @@ def ezville_loop(config):
                             #elif name == 'plug':
                                 #log('[YH] ->> TEST : [{}]'.format(packet))
                             elif name == 'plug' and STATE_PACKET:
-                                log('[YH] ->> TEST : [{}]'.format(packet))
+                                #log('[YH] ->> TEST(plug state) : [{}]'.format(packet))
                                 if STATE_PACKET:
                                     # ROOM ID
                                     rid = int(packet[5], 16)
