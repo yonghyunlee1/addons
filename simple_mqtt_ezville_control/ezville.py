@@ -487,8 +487,6 @@ def ezville_loop(config):
                                     MSG_CACHE['F7361F810F'] = packet[10:]
                                         
                             # plug는 ACK PACKET에 상태 정보가 없으므로 STATE_PACKET만 처리
-                            #elif name == 'plug':
-                                #log('[YH] ->> TEST : [{}]'.format(packet))
                             elif name == 'plug' and STATE_PACKET:
                                 #log('[YH] ->> TEST(plug state) : [{}]'.format(packet))
                                 if STATE_PACKET:
@@ -528,9 +526,11 @@ def ezville_loop(config):
                                         MSG_CACHE[packet[0:10]] = packet[10:]
                                 else:
                                     # ROOM ID
-                                    rid = int(packet[5], 16)
+                                    #yh rid = int(packet[5], 16)
+                                    rid = int(packet[4], 16)
                                     # ROOM의 plug 갯수
-                                    sid = int(packet[10:12], 16) 
+                                    #yh sid = int(packet[10:12], 16) 
+                                    sid = int(packet[5], 16)
                                 
                                     onoff = 'ON' if int(packet[13], 16) > 0 else 'OFF'
                                     
