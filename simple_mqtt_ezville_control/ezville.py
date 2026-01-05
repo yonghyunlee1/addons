@@ -493,10 +493,11 @@ def ezville_loop(config):
                                 #log('[YH] ->> TEST(plug state) : [{}]'.format(packet))
                                 if STATE_PACKET:
                                     # ROOM ID
-                                    rid = int(packet[5], 16)
+                                    #yh rid = int(packet[5], 16)
+                                    rid = int(packet[4], 16)
                                     # ROOM의 plug 갯수
-                                    spc = int(packet[10:12], 16)
-                                    #spc = int(packet[6], 16) - 1
+                                    #yh spc = int(packet[10:12], 16)
+                                    spc = int(packet[5], 16)
                                 
                                     for id in range(1, spc + 1):
                                         discovery_name = '{}_{:0>2d}_{:0>2d}'.format(name, rid, id)
