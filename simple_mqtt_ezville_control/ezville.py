@@ -514,9 +514,13 @@ def ezville_loop(config):
                                     
                                         # BIT0: 대기전력 On/Off, BIT1: 자동모드 On/Off
                                         # 위와 같지만 일단 on-off 여부만 판단
-                                        onoff = 'ON' if int(packet[7 + 6 * id], 16) > 0 else 'OFF'
-                                        autoonoff = 'ON' if int(packet[6 + 6 * id], 16) > 0 else 'OFF'
-                                        power_num = '{:.2f}'.format(int(packet[8 + 6 * id: 12 + 6 * id], 16) / 100)
+                                        #yh onoff = 'ON' if int(packet[7 + 6 * id], 16) > 0 else 'OFF'
+                                        #yh autoonoff = 'ON' if int(packet[6 + 6 * id], 16) > 0 else 'OFF'
+                                        #yh power_num = '{:.2f}'.format(int(packet[8 + 6 * id: 12 + 6 * id], 16) / 100)
+
+                                        onoff = 'ON' if int(packet[12], 16) > 0 else 'OFF'
+                                        autoonoff = 'ON' if int(packet[12], 16) > 7 else 'OFF'
+                                        power_num = '{:.2f}'.format(int(packet[13], 16)*1000 + int(packet[14], 16) * 100 + int(packet[15], 16) * 10 + int(packet[16], 16) + int(packet[17], 16) * 0.1)
                                         
                                         await update_state(name, 'power', rid, id, onoff)
                                         await update_state(name, 'auto', rid, id, onoff)
@@ -532,7 +536,8 @@ def ezville_loop(config):
                                     #yh sid = int(packet[10:12], 16) 
                                     sid = int(packet[5], 16)
                                 
-                                    onoff = 'ON' if int(packet[13], 16) > 0 else 'OFF'
+                                    #yh onoff = 'ON' if int(packet[13], 16) > 0 else 'OFF'
+                                    onoff = 'ON' if int(packet[12], 16) > 0 else 'OFF'
                                     
                                     await update_state(name, 'power', rid, id, onoff)
                                         
