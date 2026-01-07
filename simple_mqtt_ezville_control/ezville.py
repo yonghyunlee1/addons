@@ -553,11 +553,9 @@ def ezville_loop(config):
                                 
                                     onoff = 'ON' if int(packet[12], 16) > 0 else 'OFF'
                                     autoonoff = 'ON' if int(packet[12], 16) > 7 else 'OFF'
-                                    power_num = '{:.2f}'.format(int(packet[13], 16)*1000 + int(packet[14], 16) * 100 + int(packet[15], 16) * 10 + int(packet[16], 16) + int(packet[17], 16) * 0.1)
                                     
                                     await update_state(name, 'power', rid, id, onoff)
                                     await update_state(name, 'auto', rid, id, onoff)
-                                    await update_state(name, 'current', rid, id, power_num)
                                 
                                     # 직전 처리 State 패킷은 저장
                                     MSG_CACHE[packet[0:10]] = packet[10:]
