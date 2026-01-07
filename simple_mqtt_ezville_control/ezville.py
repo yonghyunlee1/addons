@@ -747,8 +747,11 @@ def ezville_loop(config):
                 elif device == 'plug':                         
                     pwr = '01' if value == 'ON' else '00'
 
-                    sendcmd = checksum('F7' + RS485_DEVICE[device]['power']['id'] + '1' + str(idx) + RS485_DEVICE[device]['power']['cmd'] + '020' + str(sid) + pwr + '0000')
-                    recvcmd = 'F7' + RS485_DEVICE[device]['power']['id'] + '1' + str(idx) + RS485_DEVICE[device]['power']['ack']
+                    #yh sendcmd = checksum('F7' + RS485_DEVICE[device]['power']['id'] + '1' + str(idx) + RS485_DEVICE[device]['power']['cmd'] + '020' + str(sid) + pwr + '0000')
+                    #yh recvcmd = 'F7' + RS485_DEVICE[device]['power']['id'] + '1' + str(idx) + RS485_DEVICE[device]['power']['ack']
+                    
+                    sendcmd = checksum('F7' + RS485_DEVICE[device]['power']['id'] +  str(idx) + str(sid) + RS485_DEVICE[device]['power']['cmd'] + '01' + pwr)
+                    recvcmd = 'F7' + RS485_DEVICE[device]['power']['id'] +  str(idx) + str(sid) + RS485_DEVICE[device]['power']['ack']
                     statcmd = [key, value]
                         
                     await CMD_QUEUE.put({'sendcmd': sendcmd, 'recvcmd': recvcmd, 'statcmd': statcmd})
