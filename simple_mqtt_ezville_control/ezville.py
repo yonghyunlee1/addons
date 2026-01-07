@@ -518,7 +518,8 @@ def ezville_loop(config):
                                         #yh autoonoff = 'ON' if int(packet[6 + 6 * id], 16) > 0 else 'OFF'
                                         #yh power_num = '{:.2f}'.format(int(packet[8 + 6 * id: 12 + 6 * id], 16) / 100)
 
-                                        if id == spc #yh
+                                        #yh
+                                        if id == spc
                                             onoff = 'ON' if int(packet[12], 16) > 0 else 'OFF'
                                             autoonoff = 'ON' if int(packet[12], 16) > 7 else 'OFF'
                                             power_num = '{:.2f}'.format(int(packet[13], 16)*1000 + int(packet[14], 16) * 100 + int(packet[15], 16) * 10 + int(packet[16], 16) + int(packet[17], 16) * 0.1)
