@@ -750,7 +750,7 @@ def ezville_loop(config):
                     #yh sendcmd = checksum('F7' + RS485_DEVICE[device]['power']['id'] + '1' + str(idx) + RS485_DEVICE[device]['power']['cmd'] + '020' + str(sid) + pwr + '0000')
                     #yh recvcmd = 'F7' + RS485_DEVICE[device]['power']['id'] + '1' + str(idx) + RS485_DEVICE[device]['power']['ack']
                     
-                    sendcmd = checksum('F7' + RS485_DEVICE[device]['power']['id'] +  str(idx) + str(sid) + RS485_DEVICE[device]['power']['cmd'] + '01' + pwr)
+                    sendcmd = checksum('F7' + RS485_DEVICE[device]['power']['id'] +  str(idx) + str(sid) + RS485_DEVICE[device]['power']['cmd'] + '01' + pwr + '0000')
                     recvcmd = 'F7' + RS485_DEVICE[device]['power']['id'] +  str(idx) + str(sid) + RS485_DEVICE[device]['power']['ack']
                     statcmd = [key, value]
                         
