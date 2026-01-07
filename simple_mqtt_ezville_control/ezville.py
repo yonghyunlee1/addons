@@ -488,7 +488,7 @@ def ezville_loop(config):
                                         
                             # plug는 ACK PACKET에 상태 정보가 없으므로 STATE_PACKET만 처리
                             elif name == 'plug' and STATE_PACKET:
-                                #log('[YH] ->> TEST(plug state) : [{}]'.format(packet))
+                                log('[YH] ->> TEST(plug state) : [{}]'.format(packet))
                                 if STATE_PACKET:
                                     # ROOM ID
                                     #yh rid = int(packet[5], 16)
