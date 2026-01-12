@@ -543,9 +543,9 @@ def ezville_loop(config):
                                     
                                     await update_state(name, 'power', rid, id, onoff)
                                     
-                            """ yh plug 응답시 ACT, STATE 두개가 동시에 와서 이건필요없음
+                            # yh plug 응답시 ACT, STATE 두개가 동시에 와서 이건필요없음
                             elif name == 'plug' and ACK_PACKET:
-                                log('[YH] ->> TEST(plug ack) : [{}]'.format(packet))
+                                #log('[YH] ->> TEST(plug ack) : [{}]'.format(packet))
                                 if ACK_PACKET:
                                     # ROOM ID
                                     #yh rid = int(packet[5], 16)
@@ -557,9 +557,9 @@ def ezville_loop(config):
                                     onoff = 'ON' if int(packet[12], 16) > 0 else 'OFF'
                                     autoonoff = 'ON' if int(packet[12], 16) > 7 else 'OFF'
                                     
-                                    await update_state(name, 'power', rid, spc, onoff)
-                                    await update_state(name, 'auto', rid, spc, onoff)
-                            """    
+                                    #await update_state(name, 'power', rid, spc, onoff)
+                                    #await update_state(name, 'auto', rid, spc, onoff)
+                                
                             elif name == 'gasvalve':
                                 # Gas Value는 하나라서 강제 설정
                                 rid = 1
