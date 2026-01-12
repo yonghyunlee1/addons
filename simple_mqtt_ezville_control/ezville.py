@@ -25,10 +25,10 @@ RS485_DEVICE = {
         'target':   { 'id': '36', 'cmd': '44', 'ack': 'C4' }
     },
     'plug': {
-#        'state':    { 'id': '50', 'cmd': '81' },
+#asis   'state':    { 'id': '50', 'cmd': '81' },
         'state':    { 'id': '39', 'cmd': '81' },
 
-#        'power':    { 'id': '50', 'cmd': '43', 'ack': 'C3' }
+#asis   'power':    { 'id': '50', 'cmd': '43', 'ack': 'C3' }
         'power':    { 'id': '39', 'cmd': '41', 'ack': 'C1' }
     },
     'gasvalve': {
@@ -488,7 +488,7 @@ def ezville_loop(config):
                                         
                             # plug는 ACK PACKET에 상태 정보가 없으므로 STATE_PACKET만 처리
                             elif name == 'plug' and STATE_PACKET:
-                                log('[YH] ->> TEST(plug state) : [{}]'.format(packet))
+                                #log('[YH] ->> TEST(plug state) : [{}]'.format(packet))
                                 if STATE_PACKET:
                                     # ROOM ID
                                     #yh rid = int(packet[5], 16)
@@ -514,11 +514,11 @@ def ezville_loop(config):
                                     
                                         # BIT0: 대기전력 On/Off, BIT1: 자동모드 On/Off
                                         # 위와 같지만 일단 on-off 여부만 판단
-                                        #yh onoff = 'ON' if int(packet[7 + 6 * id], 16) > 0 else 'OFF'
-                                        #yh autoonoff = 'ON' if int(packet[6 + 6 * id], 16) > 0 else 'OFF'
-                                        #yh power_num = '{:.2f}'.format(int(packet[8 + 6 * id: 12 + 6 * id], 16) / 100)
+                                        #asis onoff = 'ON' if int(packet[7 + 6 * id], 16) > 0 else 'OFF'
+                                        #asis autoonoff = 'ON' if int(packet[6 + 6 * id], 16) > 0 else 'OFF'
+                                        #asis power_num = '{:.2f}'.format(int(packet[8 + 6 * id: 12 + 6 * id], 16) / 100)
 
-                                        #yh
+                                        #yh 대기전력 1개당 1개의 전문으로 상태가 올라와서 for 구조가 필요없지만 변경최소화를 위해 유지함
                                         if id == spc:
                                             onoff = 'ON' if int(packet[12], 16) > 0 else 'OFF'
                                             autoonoff = 'ON' if int(packet[12], 16) > 7 else 'OFF'
@@ -543,7 +543,7 @@ def ezville_loop(config):
                                     
                                     await update_state(name, 'power', rid, id, onoff)
                                     
-                            # yh
+                            """ yh plug 응답시 ACT, STATE 두개가 동시에 와서 이건필요없음
                             elif name == 'plug' and ACK_PACKET:
                                 log('[YH] ->> TEST(plug ack) : [{}]'.format(packet))
                                 if ACK_PACKET:
@@ -559,7 +559,7 @@ def ezville_loop(config):
                                     
                                     await update_state(name, 'power', rid, spc, onoff)
                                     await update_state(name, 'auto', rid, spc, onoff)
-                                
+                            """    
                             elif name == 'gasvalve':
                                 # Gas Value는 하나라서 강제 설정
                                 rid = 1
