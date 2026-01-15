@@ -118,15 +118,16 @@ DISCOVERY_PAYLOAD = {
         '~': 'ezville/fan_{:0>2d}_{:0>2d}',
         'name': 'ezville_fan_{:0>2d}_{:0>2d}',
     
-        'stat_t': '~/state',
-        'cmd_t': '~/command',
+        'stat_t': '~/power/state',
+        'cmd_t': '~/power/command',
     
         'percentage_stat_t': '~/percentage/state',
         'percentage_cmd_t': '~/percentage/command',
     
         'preset_mode_stat_t': '~/preset_mode/state',
         'preset_mode_cmd_t': '~/preset_mode/command',
-        'preset_modes': ['bypass', 'energysaving']
+        'preset_modes': ['bypass', 'energysaving'],
+        'icon': 'mdi:fan'
     } ],
     'batch': [ {
         '_intg': 'button',
