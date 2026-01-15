@@ -614,7 +614,7 @@ def ezville_loop(config):
                                 rid = 1
                                 fid = 1
                             
-                                discovery_name = f'{name}_{rid:0>2d}_{fid:0>2d}'
+                                discovery_name = '{}_{:0>2d}_{:0>2d}'.format(name, rid, fid)
                                 if discovery_name not in DISCOVERY_LIST:
                                     DISCOVERY_LIST.append(discovery_name)
                             
@@ -634,9 +634,9 @@ def ezville_loop(config):
                             
                                 preset = 'energysaving' if int(packet[17], 16) == 3 else 'bypass'
                             
-                                await update_state('fan', 'state', rid, fid, power)
-                                await update_state('fan', 'percentage', rid, fid, percentage)
-                                await update_state('fan', 'preset_mode', rid, fid, preset)
+                                #await update_state('fan', 'state', rid, fid, power)
+                                #await update_state('fan', 'percentage', rid, fid, percentage)
+                                #await update_state('fan', 'preset_mode', rid, fid, preset)
                             
                                 MSG_CACHE[packet[0:10]] = packet[10:]
                             
