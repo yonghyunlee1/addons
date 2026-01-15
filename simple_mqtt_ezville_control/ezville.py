@@ -638,7 +638,7 @@ def ezville_loop(config):
                                 power = 'ON'
                                 percentage = 33
                                 preset = 'energysaving'
-                                #await update_state('fan', 'state', rid, fid, power)
+                                await update_state('fan', 'state', rid, fid, power)
                                 #await update_state('fan', 'percentage', rid, fid, percentage)
                                 #await update_state('fan', 'preset_mode', rid, fid, preset)
                             
