@@ -113,23 +113,6 @@ DISCOVERY_PAYLOAD = {
         'cmd_t': '~/power/command',
         'icon': 'mdi:valve'
     } ],
-    'fan': [ {
-        '_intg': 'fan',
-        '~': 'ezville/fan_{:0>2d}_{:0>2d}',
-        'name': 'ezville_fan_{:0>2d}_{:0>2d}',
-    
-        'stat_t': '~/state',
-        'cmd_t': '~/command',
-    
-        'percentage_stat_t': '~/percentage/state',
-        'percentage_cmd_t': '~/percentage/command',
-    
-        'preset_mode_stat_t': '~/preset_mode/state',
-        'preset_mode_cmd_t': '~/preset_mode/command',
-        'preset_modes': ['bypass', 'energysaving'],
-        
-        'icon': 'mdi:fan'
-    } ],
     'batch': [ {
         '_intg': 'button',
         '~': 'ezville/batch_{:0>2d}_{:0>2d}',
@@ -611,39 +594,6 @@ def ezville_loop(config):
                                 if STATE_PACKET:
                                     MSG_CACHE[packet[0:10]] = packet[10:]
 
-                            #yh 환풍기 추가
-                            elif name == 'fan' and STATE_PACKET:
-                                rid = 1
-                                fid = 1
-                            
-                                discovery_name = '{}_{:0>2d}_{:0>2d}'.format(name, rid, fid)
-                                if discovery_name not in DISCOVERY_LIST:
-                                    DISCOVERY_LIST.append(discovery_name)
-                            
-                                    payload = DISCOVERY_PAYLOAD[name][0].copy()
-                                    payload['~'] = payload['~'].format(rid, fid)
-                                    payload['name'] = payload['name'].format(rid, fid)
-
-                                    # 장치 등록 후 DISCOVERY_DELAY초 후에 State 업데이트
-                                    await mqtt_discovery(payload)
-                                    await asyncio.sleep(DISCOVERY_DELAY)
-                            
-                                #power = 'ON' if int(packet[13], 16) == 1 else 'OFF'
-                            
-                                #spd = int(packet[14], 16)
-                                #percentage = { 1: 33, 2: 66, 3: 100 }.get(spd, 33)
-                            
-                                #preset = 'energysaving' if int(packet[17], 16) == 3 else 'bypass'
-
-                                power = 'ON'
-                                percentage = 33
-                                preset = 'energysaving'
-                                #await update_state('fan', 'state', rid, fid, power)
-                                #await update_state('fan', 'percentage', rid, fid, percentage)
-                                #await update_state('fan', 'preset_mode', rid, fid, preset)
-                            
-                                MSG_CACHE[packet[0:10]] = packet[10:]
-                            
                             # 일괄차단기 ACK PACKET은 상태 업데이트에 반영하지 않음
                             elif name == 'batch' and STATE_PACKET:
                                 # 일괄차단기는 하나라서 강제 설정
