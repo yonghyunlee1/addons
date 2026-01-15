@@ -126,7 +126,7 @@ DISCOVERY_PAYLOAD = {
     
         'preset_mode_stat_t': '~/preset_mode/state',
         'preset_mode_cmd_t': '~/preset_mode/command',
-        'preset_modes': ['바이패스', '전열']
+        'preset_modes': ['bypass', 'energysaving']
     } ],
     'batch': [ {
         '_intg': 'button',
@@ -618,10 +618,11 @@ def ezville_loop(config):
                                 if discovery_name not in DISCOVERY_LIST:
                                     DISCOVERY_LIST.append(discovery_name)
                             
-                                    payload = DISCOVERY_PAYLOAD['fan'][0].copy()
+                                    payload = DISCOVERY_PAYLOAD[name][0].copy()
                                     payload['~'] = payload['~'].format(rid, fid)
                                     payload['name'] = payload['name'].format(rid, fid)
-                            
+
+                                    # 장치 등록 후 DISCOVERY_DELAY초 후에 State 업데이트
                                     await mqtt_discovery(payload)
                                     await asyncio.sleep(DISCOVERY_DELAY)
                             
@@ -631,7 +632,7 @@ def ezville_loop(config):
                                 spd = int(packet[14:15], 16)
                                 percentage = { 1: 33, 2: 66, 3: 100 }.get(spd, 33)
                             
-                                preset = '전열' if int(packet[17], 16) == 3 else '바이패스'
+                                preset = 'energysaving' if int(packet[17], 16) == 3 else 'bypass'
                             
                                 await update_state('fan', 'state', rid, fid, power)
                                 await update_state('fan', 'percentage', rid, fid, percentage)
