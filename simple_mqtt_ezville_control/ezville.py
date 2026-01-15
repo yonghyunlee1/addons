@@ -628,7 +628,6 @@ def ezville_loop(config):
                                     await mqtt_discovery(payload)
                                     await asyncio.sleep(DISCOVERY_DELAY)
                             
-                                # 🔽 패킷 위치는 직접 채우세요
                                 power = 'ON' if int(packet[13], 16) == 1 else 'OFF'
                             
                                 spd = int(packet[14], 16)
@@ -639,9 +638,9 @@ def ezville_loop(config):
                                 power = 'ON'
                                 percentage = 33
                                 preset = 'energysaving'
-                                await update_state('fan', 'state', rid, fid, power)
-                                await update_state('fan', 'percentage', rid, fid, percentage)
-                                await update_state('fan', 'preset_mode', rid, fid, preset)
+                                #await update_state('fan', 'state', rid, fid, power)
+                                #await update_state('fan', 'percentage', rid, fid, percentage)
+                                #await update_state('fan', 'preset_mode', rid, fid, preset)
                             
                                 MSG_CACHE[packet[0:10]] = packet[10:]
                             
