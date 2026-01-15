@@ -635,7 +635,10 @@ def ezville_loop(config):
                                 percentage = { 1: 33, 2: 66, 3: 100 }.get(spd, 33)
                             
                                 preset = 'energysaving' if int(packet[17], 16) == 3 else 'bypass'
-                            
+
+                                power = 'ON'
+                                persentage = 33
+                                preset = 'energysaving'
                                 await update_state('fan', 'state', rid, fid, power)
                                 await update_state('fan', 'percentage', rid, fid, percentage)
                                 await update_state('fan', 'preset_mode', rid, fid, preset)
