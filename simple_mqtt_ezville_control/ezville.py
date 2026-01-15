@@ -36,6 +36,13 @@ RS485_DEVICE = {
 
         'power':    { 'id': '12', 'cmd': '41', 'ack': 'C1' } # 잠그기만 가능
     },
+    'fan': {
+        'state': { 'id': '32', 'cmd': '81' },
+
+        'power': { 'id': '32', 'cmd': '41', 'ack': 'C1' },
+        'speed': { 'id': '32', 'cmd': '42', 'ack': 'C2' },
+        'mode':  { 'id': '32', 'cmd': '43', 'ack': 'C3' }
+    },
     'batch': {
         'state':    { 'id': '33', 'cmd': '81' },
 
@@ -105,6 +112,21 @@ DISCOVERY_PAYLOAD = {
         'stat_t': '~/power/state',
         'cmd_t': '~/power/command',
         'icon': 'mdi:valve'
+    } ],
+    'fan': [ {
+        '_intg': 'fan',
+        '~': 'ezville/fan_{:0>2d}_{:0>2d}',
+        'name': 'ezville_fan_{:0>2d}_{:0>2d}',
+    
+        'stat_t': '~/state',
+        'cmd_t': '~/command',
+    
+        'percentage_stat_t': '~/percentage/state',
+        'percentage_cmd_t': '~/percentage/command',
+    
+        'preset_mode_stat_t': '~/preset_mode/state',
+        'preset_mode_cmd_t': '~/preset_mode/command',
+        'preset_modes': ['바이패스', '전열']
     } ],
     'batch': [ {
         '_intg': 'button',
@@ -586,6 +608,36 @@ def ezville_loop(config):
                                 # 직전 처리 State 패킷은 저장
                                 if STATE_PACKET:
                                     MSG_CACHE[packet[0:10]] = packet[10:]
+
+                            #yh 환풍기 추가
+                            elif name == 'fan' and STATE_PACKET:
+                                rid = 1
+                                fid = 1
+                            
+                                discovery_name = f'{name}_{rid:0>2d}_{fid:0>2d}'
+                                if discovery_name not in DISCOVERY_LIST:
+                                    DISCOVERY_LIST.append(discovery_name)
+                            
+                                    payload = DISCOVERY_PAYLOAD['fan'][0].copy()
+                                    payload['~'] = payload['~'].format(rid, fid)
+                                    payload['name'] = payload['name'].format(rid, fid)
+                            
+                                    await mqtt_discovery(payload)
+                                    await asyncio.sleep(DISCOVERY_DELAY)
+                            
+                                # 🔽 패킷 위치는 직접 채우세요
+                                power = 'ON' if int(packet[13], 16) == 1 else 'OFF'
+                            
+                                spd = int(packet[14:15], 16)
+                                percentage = { 1: 33, 2: 66, 3: 100 }.get(spd, 33)
+                            
+                                preset = '전열' if int(packet[17], 16) == 3 else '바이패스'
+                            
+                                await update_state('fan', 'state', rid, fid, power)
+                                await update_state('fan', 'percentage', rid, fid, percentage)
+                                await update_state('fan', 'preset_mode', rid, fid, preset)
+                            
+                                MSG_CACHE[packet[0:10]] = packet[10:]
                             
                             # 일괄차단기 ACK PACKET은 상태 업데이트에 반영하지 않음
                             elif name == 'batch' and STATE_PACKET:
