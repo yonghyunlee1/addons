@@ -631,13 +631,13 @@ def ezville_loop(config):
                                 # 🔽 패킷 위치는 직접 채우세요
                                 power = 'ON' if int(packet[13], 16) == 1 else 'OFF'
                             
-                                spd = int(packet[14:15], 16)
+                                spd = int(packet[14], 16)
                                 percentage = { 1: 33, 2: 66, 3: 100 }.get(spd, 33)
                             
                                 preset = 'energysaving' if int(packet[17], 16) == 3 else 'bypass'
 
                                 power = 'ON'
-                                persentage = 33
+                                percentage = 33
                                 preset = 'energysaving'
                                 await update_state('fan', 'state', rid, fid, power)
                                 await update_state('fan', 'percentage', rid, fid, percentage)
