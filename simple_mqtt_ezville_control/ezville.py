@@ -1,3 +1,4 @@
+import traceback
 import paho.mqtt.client as mqtt
 import json
 import time
@@ -47,6 +48,10 @@ RS485_DEVICE = {
         'state':    { 'id': '33', 'cmd': '81' },
 
         'press':    { 'id': '33', 'cmd': '41', 'ack': 'C1' }
+    }
+    'meter': {
+        'state':    { 'id': '30', 'cmd': '81' },
+        'press':    { 'id': '30', 'cmd': '01'}
     }
 }
 
@@ -140,7 +145,174 @@ DISCOVERY_PAYLOAD = {
         'name': 'ezville_batch-outing_{:0>2d}_{:0>2d}',
         'stat_t': '~/outing/state',
         'icon': 'mdi:home-circle'
-    } ]
+    } ],
+    'meter': [
+    {
+        '_item_type': 'request_button',
+        '_intg': 'button',
+        '~': 'ezville/meter_{:0>2d}_{:0>2d}',
+        'name': 'ezville_metter-request_{:0>2d}_{:0>2d}',
+        'cmd_t': '~/request/command',
+        'icon': 'mdi:refresh'
+    },
+    {
+        '_item_type': 'current_state',
+        '_intg': 'sensor',
+        '~': 'ezville/meter_{:0>2d}_{:0>2d}',
+        'name': 'ezville_metter-current_{:0>2d}_{:0>2d}',
+        'stat_t': '~/current/state',
+        'dev_cla': 'power',             # 검침기따라 다른 속성
+        'stat_cla': 'measurement',
+        'unit_of_meas': 'W',            # 검침기따라 다른 속성
+        'icon': 'mdi:lightning-bolt'    # 검침기따라 다른 속성
+    },
+    {
+        '_item_type': 'total_state',
+        '_intg': 'sensor',
+        '~': 'ezville/meter_{:0>2d}_{:0>2d}',
+        'name': 'ezville_metter-total_{:0>2d}_{:0>2d}',
+        'stat_t': '~/total/state',
+        'dev_cla': 'energy',
+        'stat_cla': 'total_increasing',
+        'unit_of_meas': 'kWh',          # 검침기따라 다른 속성
+        'icon': 'mdi:lightning-bolt'    # 검침기따라 다른 속성
+    }
+    ]
+}
+
+METER_TYPE_OPT = {
+    # 수도
+    0x01: {
+        'discovery_payload': {
+            'request_button': {
+                'name': 'ezville_metter-request-water',
+            },
+            'current_state': {
+                'name': 'ezville_metter-current-water',
+                'dev_cla': 'water',
+                'unit_of_meas': 'm³',
+                'icon': 'mdi:water'
+            },
+            'total_state': {
+                'name': 'ezville_metter-total-water',
+                'dev_cla': 'water',
+                'unit_of_meas': 'm³',
+                'icon': 'mdi:counter'
+            }
+        },
+        'current_num_div': 1000,
+        'current_num_format': '{:.3f}',
+        'total_num_div': 100,
+        'total_num_format': '{:.2f}'
+    },
+    # 가스
+    0x02: {
+        'discovery_payload': {
+            'request_button': {
+                'name': 'ezville_metter-request-gas',
+            },
+            'current_state': {
+                'name': 'ezville_metter-current-gas',
+                'dev_cla': 'gas',
+                'unit_of_meas': 'm³',
+                'icon': 'mdi:gas-cylinder'
+            },
+            'total_state': {
+                'name': 'ezville_metter-total-gas',
+                'dev_cla': 'gas',
+                'unit_of_meas': 'm³',
+                'icon': 'mdi:meter-gas'
+            }
+        },
+        'current_num_div': 1000,
+        'current_num_format': '{:.3f}',
+        'total_num_div': 100,
+        'total_num_format': '{:.2f}'
+    },
+    # 전기
+    0x03: {
+        'discovery_payload': {
+            'request_button': {
+                'name': 'ezville_metter-request-power',
+            },
+            'current_state': {
+                'name': 'ezville_metter-current-power',
+                'dev_cla': 'power',
+                'unit_of_meas': 'W',
+                'icon': 'mdi:flash'
+            },
+            'total_state': {
+                'name': 'ezville_metter-total-power',
+                'dev_cla': 'energy',
+                'unit_of_meas': 'kWh',
+                'icon': 'mdi:meter-electric'
+            }
+        },
+        'current_num_div': 1,
+        'current_num_format': '{:.0f}',
+        'total_num_div': 10,
+        'total_num_format': '{:.1f}'
+    },
+    # 온수
+    0x04: {
+        'discovery_payload': {
+            'request_button': {
+                'name': 'ezville_metter-request-hotwater',
+            },
+            'current_state': {
+                'name': 'ezville_metter-current-hotwater',
+                'dev_cla': 'water',
+                'unit_of_meas': 'm³',
+                'icon': 'mdi:water-thermometer'
+            },
+            'total_state': {
+                'name': 'ezville_metter-total-hotwater',
+                'dev_cla': 'water',
+                'unit_of_meas': 'm³',
+                'icon': 'mdi:counter'
+            },
+        },
+        'current_num_div': 1000,
+        'current_num_format': '{:.3f}',
+        'total_num_div': 100,
+        'total_num_format': '{:.2f}'
+    },
+    # 열량
+    0x05: {
+        'discovery_payload': {
+            'request_button': {
+                'name': 'ezville_metter-request-heat',
+            },
+            'current_state': {
+                'name': 'ezville_metter-current-heat',
+                'dev_cla': 'power',
+                'unit_of_meas': 'MW',
+                'icon': 'mdi:home-thermometer'
+            },
+            'total_state': {
+                'name': 'ezville_metter-total-heat',
+                'dev_cla': 'energy',
+                'unit_of_meas': 'MWh',
+                'icon': 'mdi:counter'
+            }
+        },
+        'current_num_div': 1000,
+        'current_num_format': '{:.3f}',
+        'total_num_div': 100,
+        'total_num_format': '{:.2f}'
+    },
+    # 일괄조회
+    0x0F: {
+        'discovery_payload': {
+            'request_button': {
+                '_intg': 'button',
+                '~': 'ezville/meter_00_15',
+                'name': 'ezville_metter-request-all',
+                'cmd_t': '~/request/command',
+                'icon': 'mdi:refresh'
+            }
+        }
+    }
 }
 
 # STATE 확인용 Dictionary
@@ -388,263 +560,329 @@ def ezville_loop(config):
                     k+=1
                     continue
                 else:
-                    STATE_PACKET = False
-                    ACK_PACKET = False
-                    
-                    # STATE 패킷인지 확인
-                    if packet[2:4] in STATE_HEADER and packet[6:8] in STATE_HEADER[packet[2:4]][1]:
-                        STATE_PACKET = True
-                    # ACK 패킷인지 확인
-                    elif packet[2:4] in ACK_HEADER and packet[6:8] in ACK_HEADER[packet[2:4]][1]:
-                        ACK_PACKET = True
-                    
-                    if STATE_PACKET or ACK_PACKET:
-                        # MSG_CACHE에 없는 새로운 패킷이거나 FORCE_UPDATE 실행된 경우만 실행
-                        if MSG_CACHE.get(packet[0:10]) != packet[10:] or FORCE_UPDATE:
-                            name = STATE_HEADER[packet[2:4]][0]                            
-                            if name == 'light':
-                                # ROOM ID
-                                rid = int(packet[5], 16)
-                                # ROOM의 light 갯수 + 1
-                                slc = int(packet[8:10], 16) 
-                                
-                                for id in range(1, slc):
-                                    discovery_name = '{}_{:0>2d}_{:0>2d}'.format(name, rid, id)
+                    try:
+                        STATE_PACKET = False
+                        ACK_PACKET = False
+                        
+                        # STATE 패킷인지 확인
+                        if packet[2:4] in STATE_HEADER and packet[6:8] in STATE_HEADER[packet[2:4]][1]:
+                            STATE_PACKET = True
+                        # ACK 패킷인지 확인
+                        elif packet[2:4] in ACK_HEADER and packet[6:8] in ACK_HEADER[packet[2:4]][1]:
+                            ACK_PACKET = True
+                        
+                        if STATE_PACKET or ACK_PACKET:
+                            # MSG_CACHE에 없는 새로운 패킷이거나 FORCE_UPDATE 실행된 경우만 실행
+                            if MSG_CACHE.get(packet[0:10]) != packet[10:] or FORCE_UPDATE:
+                                name = STATE_HEADER[packet[2:4]][0]                            
+                                if name == 'light':
+                                    # ROOM ID
+                                    rid = int(packet[5], 16)
+                                    # ROOM의 light 갯수 + 1
+                                    slc = int(packet[8:10], 16) 
                                     
-                                    if discovery_name not in DISCOVERY_LIST:
-                                        DISCOVERY_LIST.append(discovery_name)
-                                    
-                                        payload = DISCOVERY_PAYLOAD[name][0].copy()
-                                        payload['~'] = payload['~'].format(rid, id)
-                                        payload['name'] = payload['name'].format(rid, id)
-                                   
-                                        # 장치 등록 후 DISCOVERY_DELAY초 후에 State 업데이트
-                                        await mqtt_discovery(payload)
-                                        await asyncio.sleep(DISCOVERY_DELAY)
-                                    
-                                    # State 업데이트까지 진행
-                                    onoff = 'ON' if int(packet[10 + 2 * id: 12 + 2 * id], 16) > 0 else 'OFF'
-
-                                    #디밍조명 예외처리 yh
-                                    if rid == 1:
-                                        if id == 1 or id == 2:
+                                    for id in range(1, slc):
+                                        discovery_name = '{}_{:0>2d}_{:0>2d}'.format(name, rid, id)
+                                        
+                                        if discovery_name not in DISCOVERY_LIST:
+                                            DISCOVERY_LIST.append(discovery_name)
+                                        
+                                            payload = DISCOVERY_PAYLOAD[name][0].copy()
+                                            payload['~'] = payload['~'].format(rid, id)
+                                            payload['name'] = payload['name'].format(rid, id)
+                                       
+                                            # 장치 등록 후 DISCOVERY_DELAY초 후에 State 업데이트
+                                            await mqtt_discovery(payload)
+                                            await asyncio.sleep(DISCOVERY_DELAY)
+                                        
+                                        # State 업데이트까지 진행
+                                        onoff = 'ON' if int(packet[10 + 2 * id: 12 + 2 * id], 16) > 0 else 'OFF'
+    
+                                        #디밍조명 예외처리 yh
+                                        if rid == 1:
+                                            if id == 1 or id == 2:
+                                                if int(packet[10 + 2 * id: 12 + 2 * id], 16) > 6:
+                                                    onoff = 'ON'
+                                                else: 
+                                                    onoff = 'OFF'
+                                        elif rid == 2 or rid == 3 or rid == 4 or rid == 5:
                                             if int(packet[10 + 2 * id: 12 + 2 * id], 16) > 6:
                                                 onoff = 'ON'
                                             else: 
                                                 onoff = 'OFF'
-                                    elif rid == 2 or rid == 3 or rid == 4 or rid == 5:
-                                        if int(packet[10 + 2 * id: 12 + 2 * id], 16) > 6:
-                                            onoff = 'ON'
-                                        else: 
-                                            onoff = 'OFF'
-
-                                    #log('[YH] ->> onoff : {} [{}] >> {} {} %%% {}'.format(onoff, int(packet[10 + 2 * id: 12 + 2 * id], 16), rid, id, packet))
+    
+                                        #log('[YH] ->> onoff : {} [{}] >> {} {} %%% {}'.format(onoff, int(packet[10 + 2 * id: 12 + 2 * id], 16), rid, id, packet))
+                                            
+                                        await update_state(name, 'power', rid, id, onoff)
                                         
-                                    await update_state(name, 'power', rid, id, onoff)
+                                        # 직전 처리 State 패킷은 저장
+                                        if STATE_PACKET:
+                                            MSG_CACHE[packet[0:10]] = packet[10:]
+                                                                                        
+                                elif name == 'thermostat':
+                                    # room 갯수
+                                    rc = int((int(packet[8:10], 16) - 5) / 2)
+                                    # room의 조절기 수 (현재 하나 뿐임)
+                                    src = 1
+                                    
+                                    onoff_state = bin(int(packet[12:14], 16))[2:].zfill(8)
+                                    away_state = bin(int(packet[14:16], 16))[2:].zfill(8)
+                                    
+                                    for rid in range(1, rc + 1):
+                                        discovery_name = '{}_{:0>2d}_{:0>2d}'.format(name, rid, src)
+                                        
+                                        if discovery_name not in DISCOVERY_LIST:
+                                            DISCOVERY_LIST.append(discovery_name)
+                                        
+                                            payload = DISCOVERY_PAYLOAD[name][0].copy()
+                                            payload['~'] = payload['~'].format(rid, src)
+                                            payload['name'] = payload['name'].format(rid, src)
+                                       
+                                            # 장치 등록 후 DISCOVERY_DELAY초 후에 State 업데이트
+                                            await mqtt_discovery(payload)
+                                            await asyncio.sleep(DISCOVERY_DELAY)
+                                        
+                                        setT = str(int(packet[16 + 4 * rid:18 + 4 * rid], 16))
+                                        curT = str(int(packet[18 + 4 * rid:20 + 4 * rid], 16))
+                                        
+                                        if onoff_state[8 - rid ] == '1':
+                                            onoff = 'heat'
+                                        # 외출 모드는 off로 
+                                        elif onoff_state[8 - rid] == '0' and away_state[8 - rid] == '1':
+                                            onoff = 'off'
+    #                                    elif onoff_state[8 - rid] == '0' and away_state[8 - rid] == '0':
+    #                                        onoff = 'off'
+    #                                    else:
+    #                                        onoff = 'off'
+    
+                                        await update_state(name, 'power', rid, src, onoff)
+                                        await update_state(name, 'curTemp', rid, src, curT)
+                                        await update_state(name, 'setTemp', rid, src, setT)
+                                        
+                                    # 직전 처리 State 패킷은 저장
+                                    if STATE_PACKET:
+                                        MSG_CACHE[packet[0:10]] = packet[10:]
+                                    else:
+                                        # Ack 패킷도 State로 저장
+                                        MSG_CACHE['F7361F810F'] = packet[10:]
+                                            
+                                # plug는 ACK PACKET에 상태 정보가 없으므로 STATE_PACKET만 처리
+                                elif name == 'plug' and STATE_PACKET:
+                                    #log('[YH] ->> TEST(plug state) : [{}]'.format(packet))
+                                    if STATE_PACKET:
+                                        # ROOM ID
+                                        #yh rid = int(packet[5], 16)
+                                        rid = int(packet[4], 16)
+                                        # ROOM의 plug 갯수
+                                        #yh spc = int(packet[10:12], 16)
+                                        spc = int(packet[5], 16)
+                                    
+                                        for id in range(1, spc + 1):
+                                            discovery_name = '{}_{:0>2d}_{:0>2d}'.format(name, rid, id)
+    
+                                            if discovery_name not in DISCOVERY_LIST:
+                                                DISCOVERY_LIST.append(discovery_name)
+                                        
+                                                for payload_template in DISCOVERY_PAYLOAD[name]:
+                                                    payload = payload_template.copy()
+                                                    payload['~'] = payload['~'].format(rid, id)
+                                                    payload['name'] = payload['name'].format(rid, id)
+                                       
+                                                    # 장치 등록 후 DISCOVERY_DELAY초 후에 State 업데이트
+                                                    await mqtt_discovery(payload)
+                                                    await asyncio.sleep(DISCOVERY_DELAY)  
+                                        
+                                            # BIT0: 대기전력 On/Off, BIT1: 자동모드 On/Off
+                                            # 위와 같지만 일단 on-off 여부만 판단
+                                            #asis onoff = 'ON' if int(packet[7 + 6 * id], 16) > 0 else 'OFF'
+                                            #asis autoonoff = 'ON' if int(packet[6 + 6 * id], 16) > 0 else 'OFF'
+                                            #asis power_num = '{:.2f}'.format(int(packet[8 + 6 * id: 12 + 6 * id], 16) / 100)
+    
+                                            #yh 대기전력 1개당 1개의 전문으로 상태가 올라와서 for 구조가 필요없지만 변경최소화를 위해 유지함
+                                            if id == spc:
+                                                onoff = 'ON' if int(packet[12], 16) > 0 else 'OFF'
+                                                autoonoff = 'ON' if int(packet[12], 16) > 7 else 'OFF'
+                                                power_num = '{:.2f}'.format(int(packet[13], 16)*1000 + int(packet[14], 16) * 100 + int(packet[15], 16) * 10 + int(packet[16], 16) + int(packet[17], 16) * 0.1)
+                                                
+                                                await update_state(name, 'power', rid, id, onoff)
+                                                await update_state(name, 'auto', rid, id, onoff)
+                                                await update_state(name, 'current', rid, id, power_num)
+                                        
+                                            # 직전 처리 State 패킷은 저장
+                                            MSG_CACHE[packet[0:10]] = packet[10:]
+                                    else:
+                                        # ROOM ID
+                                        #yh rid = int(packet[5], 16)
+                                        rid = int(packet[4], 16)
+                                        # ROOM의 plug 갯수
+                                        #yh sid = int(packet[10:12], 16) 
+                                        sid = int(packet[5], 16)
+                                    
+                                        #yh onoff = 'ON' if int(packet[13], 16) > 0 else 'OFF'
+                                        onoff = 'ON' if int(packet[12], 16) > 0 else 'OFF'
+                                        
+                                        await update_state(name, 'power', rid, id, onoff)
+                                        
+                                # yh plug 응답시 ACT, STATE 두개가 동시에 와서 이건필요없음
+                                elif name == 'plug' and ACK_PACKET:
+                                    #log('[YH] ->> TEST(plug ack) : [{}]'.format(packet))
+                                    if ACK_PACKET:
+                                        # ROOM ID
+                                        #yh rid = int(packet[5], 16)
+                                        rid = int(packet[4], 16)
+                                        # ROOM의 plug 갯수
+                                        #yh spc = int(packet[10:12], 16)
+                                        spc = int(packet[5], 16)
+                                    
+                                        onoff = 'ON' if int(packet[12], 16) > 0 else 'OFF'
+                                        autoonoff = 'ON' if int(packet[12], 16) > 7 else 'OFF'
+                                        
+                                        #await update_state(name, 'power', rid, spc, onoff)
+                                        #await update_state(name, 'auto', rid, spc, onoff)
+                                    
+                                elif name == 'gasvalve':
+                                    # Gas Value는 하나라서 강제 설정
+                                    rid = 1
+                                    # Gas Value는 하나라서 강제 설정
+                                    spc = 1 
+                                    
+                                    discovery_name = '{}_{:0>2d}_{:0>2d}'.format(name, rid, spc)
+                                        
+                                    if discovery_name not in DISCOVERY_LIST:
+                                        DISCOVERY_LIST.append(discovery_name)
+                                        
+                                        payload = DISCOVERY_PAYLOAD[name][0].copy()
+                                        payload['~'] = payload['~'].format(rid, spc)
+                                        payload['name'] = payload['name'].format(rid, spc)
+                                       
+                                        # 장치 등록 후 DISCOVERY_DELAY초 후에 State 업데이트
+                                        await mqtt_discovery(payload)
+                                        await asyncio.sleep(DISCOVERY_DELAY)                                
+    
+                                    onoff = 'ON' if int(packet[12:14], 16) == 1 else 'OFF'
+                                            
+                                    await update_state(name, 'power', rid, spc, onoff)
                                     
                                     # 직전 처리 State 패킷은 저장
                                     if STATE_PACKET:
                                         MSG_CACHE[packet[0:10]] = packet[10:]
-                                                                                    
-                            elif name == 'thermostat':
-                                # room 갯수
-                                rc = int((int(packet[8:10], 16) - 5) / 2)
-                                # room의 조절기 수 (현재 하나 뿐임)
-                                src = 1
-                                
-                                onoff_state = bin(int(packet[12:14], 16))[2:].zfill(8)
-                                away_state = bin(int(packet[14:16], 16))[2:].zfill(8)
-                                
-                                for rid in range(1, rc + 1):
-                                    discovery_name = '{}_{:0>2d}_{:0>2d}'.format(name, rid, src)
+    
+                                # 일괄차단기 ACK PACKET은 상태 업데이트에 반영하지 않음
+                                elif name == 'batch' and STATE_PACKET:
+                                    # 일괄차단기는 하나라서 강제 설정
+                                    rid = 1
+                                    # 일괄차단기는 하나라서 강제 설정
+                                    sbc = 1
+                                    
+                                    discovery_name = '{}_{:0>2d}_{:0>2d}'.format(name, rid, sbc)
                                     
                                     if discovery_name not in DISCOVERY_LIST:
                                         DISCOVERY_LIST.append(discovery_name)
-                                    
-                                        payload = DISCOVERY_PAYLOAD[name][0].copy()
-                                        payload['~'] = payload['~'].format(rid, src)
-                                        payload['name'] = payload['name'].format(rid, src)
-                                   
-                                        # 장치 등록 후 DISCOVERY_DELAY초 후에 State 업데이트
-                                        await mqtt_discovery(payload)
-                                        await asyncio.sleep(DISCOVERY_DELAY)
-                                    
-                                    setT = str(int(packet[16 + 4 * rid:18 + 4 * rid], 16))
-                                    curT = str(int(packet[18 + 4 * rid:20 + 4 * rid], 16))
-                                    
-                                    if onoff_state[8 - rid ] == '1':
-                                        onoff = 'heat'
-                                    # 외출 모드는 off로 
-                                    elif onoff_state[8 - rid] == '0' and away_state[8 - rid] == '1':
-                                        onoff = 'off'
-#                                    elif onoff_state[8 - rid] == '0' and away_state[8 - rid] == '0':
-#                                        onoff = 'off'
-#                                    else:
-#                                        onoff = 'off'
-
-                                    await update_state(name, 'power', rid, src, onoff)
-                                    await update_state(name, 'curTemp', rid, src, curT)
-                                    await update_state(name, 'setTemp', rid, src, setT)
-                                    
-                                # 직전 처리 State 패킷은 저장
-                                if STATE_PACKET:
-                                    MSG_CACHE[packet[0:10]] = packet[10:]
-                                else:
-                                    # Ack 패킷도 State로 저장
-                                    MSG_CACHE['F7361F810F'] = packet[10:]
                                         
-                            # plug는 ACK PACKET에 상태 정보가 없으므로 STATE_PACKET만 처리
-                            elif name == 'plug' and STATE_PACKET:
-                                #log('[YH] ->> TEST(plug state) : [{}]'.format(packet))
-                                if STATE_PACKET:
-                                    # ROOM ID
-                                    #yh rid = int(packet[5], 16)
-                                    rid = int(packet[4], 16)
-                                    # ROOM의 plug 갯수
-                                    #yh spc = int(packet[10:12], 16)
-                                    spc = int(packet[5], 16)
-                                
-                                    for id in range(1, spc + 1):
-                                        discovery_name = '{}_{:0>2d}_{:0>2d}'.format(name, rid, id)
-
-                                        if discovery_name not in DISCOVERY_LIST:
-                                            DISCOVERY_LIST.append(discovery_name)
-                                    
-                                            for payload_template in DISCOVERY_PAYLOAD[name]:
-                                                payload = payload_template.copy()
-                                                payload['~'] = payload['~'].format(rid, id)
-                                                payload['name'] = payload['name'].format(rid, id)
-                                   
-                                                # 장치 등록 후 DISCOVERY_DELAY초 후에 State 업데이트
-                                                await mqtt_discovery(payload)
-                                                await asyncio.sleep(DISCOVERY_DELAY)  
-                                    
-                                        # BIT0: 대기전력 On/Off, BIT1: 자동모드 On/Off
-                                        # 위와 같지만 일단 on-off 여부만 판단
-                                        #asis onoff = 'ON' if int(packet[7 + 6 * id], 16) > 0 else 'OFF'
-                                        #asis autoonoff = 'ON' if int(packet[6 + 6 * id], 16) > 0 else 'OFF'
-                                        #asis power_num = '{:.2f}'.format(int(packet[8 + 6 * id: 12 + 6 * id], 16) / 100)
-
-                                        #yh 대기전력 1개당 1개의 전문으로 상태가 올라와서 for 구조가 필요없지만 변경최소화를 위해 유지함
-                                        if id == spc:
-                                            onoff = 'ON' if int(packet[12], 16) > 0 else 'OFF'
-                                            autoonoff = 'ON' if int(packet[12], 16) > 7 else 'OFF'
-                                            power_num = '{:.2f}'.format(int(packet[13], 16)*1000 + int(packet[14], 16) * 100 + int(packet[15], 16) * 10 + int(packet[16], 16) + int(packet[17], 16) * 0.1)
+                                        for payload_template in DISCOVERY_PAYLOAD[name]:
+                                            payload = payload_template.copy()
+                                            payload['~'] = payload['~'].format(rid, sbc)
+                                            payload['name'] = payload['name'].format(rid, sbc)
+                                       
+                                            # 장치 등록 후 DISCOVERY_DELAY초 후에 State 업데이트
+                                            await mqtt_discovery(payload)
+                                            await asyncio.sleep(DISCOVERY_DELAY)           
+    
+                                    # 일괄 차단기는 버튼 상태 변수 업데이트
+                                    states = bin(int(packet[12:14], 16))[2:].zfill(8)
                                             
-                                            await update_state(name, 'power', rid, id, onoff)
-                                            await update_state(name, 'auto', rid, id, onoff)
-                                            await update_state(name, 'current', rid, id, power_num)
+                                    ELEVDOWN = states[2]                                        
+                                    ELEVUP = states[3]
+                                    GROUPON = states[5]
+                                    OUTING = states[6]
+                                                                        
+                                    grouponoff = 'ON' if GROUPON == '1' else 'OFF'
+                                    outingonoff = 'ON' if OUTING == '1' else 'OFF'
                                     
-                                        # 직전 처리 State 패킷은 저장
-                                        MSG_CACHE[packet[0:10]] = packet[10:]
-                                else:
-                                    # ROOM ID
-                                    #yh rid = int(packet[5], 16)
-                                    rid = int(packet[4], 16)
-                                    # ROOM의 plug 갯수
-                                    #yh sid = int(packet[10:12], 16) 
-                                    sid = int(packet[5], 16)
-                                
-                                    #yh onoff = 'ON' if int(packet[13], 16) > 0 else 'OFF'
-                                    onoff = 'ON' if int(packet[12], 16) > 0 else 'OFF'
-                                    
-                                    await update_state(name, 'power', rid, id, onoff)
-                                    
-                            # yh plug 응답시 ACT, STATE 두개가 동시에 와서 이건필요없음
-                            elif name == 'plug' and ACK_PACKET:
-                                #log('[YH] ->> TEST(plug ack) : [{}]'.format(packet))
-                                if ACK_PACKET:
-                                    # ROOM ID
-                                    #yh rid = int(packet[5], 16)
-                                    rid = int(packet[4], 16)
-                                    # ROOM의 plug 갯수
-                                    #yh spc = int(packet[10:12], 16)
-                                    spc = int(packet[5], 16)
-                                
-                                    onoff = 'ON' if int(packet[12], 16) > 0 else 'OFF'
-                                    autoonoff = 'ON' if int(packet[12], 16) > 7 else 'OFF'
-                                    
-                                    #await update_state(name, 'power', rid, spc, onoff)
-                                    #await update_state(name, 'auto', rid, spc, onoff)
-                                
-                            elif name == 'gasvalve':
-                                # Gas Value는 하나라서 강제 설정
-                                rid = 1
-                                # Gas Value는 하나라서 강제 설정
-                                spc = 1 
-                                
-                                discovery_name = '{}_{:0>2d}_{:0>2d}'.format(name, rid, spc)
-                                    
-                                if discovery_name not in DISCOVERY_LIST:
-                                    DISCOVERY_LIST.append(discovery_name)
-                                    
-                                    payload = DISCOVERY_PAYLOAD[name][0].copy()
-                                    payload['~'] = payload['~'].format(rid, spc)
-                                    payload['name'] = payload['name'].format(rid, spc)
-                                   
-                                    # 장치 등록 후 DISCOVERY_DELAY초 후에 State 업데이트
-                                    await mqtt_discovery(payload)
-                                    await asyncio.sleep(DISCOVERY_DELAY)                                
-
-                                onoff = 'ON' if int(packet[12:14], 16) == 1 else 'OFF'
+                                    #ELEVDOWN과 ELEVUP은 직접 DEVICE_STATE에 저장
+                                    elevdownonoff = 'ON' if ELEVDOWN == '1' else 'OFF'
+                                    elevuponoff = 'ON' if ELEVUP == '1' else 'OFF'
+                                    DEVICE_STATE['batch_01_01elevator-up'] = elevuponoff
+                                    DEVICE_STATE['batch_01_01elevator-down'] = elevdownonoff
                                         
-                                await update_state(name, 'power', rid, spc, onoff)
-                                
-                                # 직전 처리 State 패킷은 저장
-                                if STATE_PACKET:
+                                    # 일괄 조명 및 외출 모드는 상태 업데이트
+                                    await update_state(name, 'group', rid, sbc, grouponoff)
+                                    await update_state(name, 'outing', rid, sbc, outingonoff)
+                                    
                                     MSG_CACHE[packet[0:10]] = packet[10:]
 
-                            # 일괄차단기 ACK PACKET은 상태 업데이트에 반영하지 않음
-                            elif name == 'batch' and STATE_PACKET:
-                                # 일괄차단기는 하나라서 강제 설정
-                                rid = 1
-                                # 일괄차단기는 하나라서 강제 설정
-                                sbc = 1
-                                
-                                discovery_name = '{}_{:0>2d}_{:0>2d}'.format(name, rid, sbc)
-                                
-                                if discovery_name not in DISCOVERY_LIST:
-                                    DISCOVERY_LIST.append(discovery_name)
-                                    
-                                    for payload_template in DISCOVERY_PAYLOAD[name]:
-                                        payload = payload_template.copy()
-                                        payload['~'] = payload['~'].format(rid, sbc)
-                                        payload['name'] = payload['name'].format(rid, sbc)
-                                   
-                                        # 장치 등록 후 DISCOVERY_DELAY초 후에 State 업데이트
-                                        await mqtt_discovery(payload)
-                                        await asyncio.sleep(DISCOVERY_DELAY)           
+                                elif name == 'meter' and STATE_PACKET:
+                                    # 원격 검침
+                                    if packet[4:6] == '0F':
+                                        # 전체 검침 상태 응답 (모든 검침기 상태 포함 - 수도, 가스, 전기, 온수, 열량 순))
+                                        # 데이터 순서 - 순시치: 3자리, 누적량: 4자리 (총 7자리) * 검침기 수
+                                        meter_num = (int(packet[8:10], 16)) // 7
+                                        for meter_type_idx in range(1, meter_num + 1):
+                                            dev_sub_id = '0' + str(meter_type_idx)
+                                            data = packet[10 + ((meter_type_idx - 1) * 14): 10 + (meter_type_idx * 14)]
+                                            await rev_meter_state(dev_sub_id, data)
 
-                                # 일괄 차단기는 버튼 상태 변수 업데이트
-                                states = bin(int(packet[12:14], 16))[2:].zfill(8)
-                                        
-                                ELEVDOWN = states[2]                                        
-                                ELEVUP = states[3]
-                                GROUPON = states[5]
-                                OUTING = states[6]
-                                                                    
-                                grouponoff = 'ON' if GROUPON == '1' else 'OFF'
-                                outingonoff = 'ON' if OUTING == '1' else 'OFF'
-                                
-                                #ELEVDOWN과 ELEVUP은 직접 DEVICE_STATE에 저장
-                                elevdownonoff = 'ON' if ELEVDOWN == '1' else 'OFF'
-                                elevuponoff = 'ON' if ELEVUP == '1' else 'OFF'
-                                DEVICE_STATE['batch_01_01elevator-up'] = elevuponoff
-                                DEVICE_STATE['batch_01_01elevator-down'] = elevdownonoff
+                                    else:
+                                        # 데이터 순서 - 에러상태: 1자리, 순시치: 3자리, 누적량: 4자리 
+                                        await rev_meter_state(packet[4:6], packet[12:26])
                                     
-                                # 일괄 조명 및 외출 모드는 상태 업데이트
-                                await update_state(name, 'group', rid, sbc, grouponoff)
-                                await update_state(name, 'outing', rid, sbc, outingonoff)
-                                
-                                MSG_CACHE[packet[0:10]] = packet[10:]
-                                                                                    
+                                    # 직전 처리 State 패킷은 저장
+                                    MSG_CACHE[packet[0:10]] = packet[10:]
+                
+                    except Exception as e:
+                        log(f'패킷 처리중 오류 발생 - packet: {packet}, error: {str(e)}')
+                        log(traceback.format_exc())
+
+                
                 RESIDUE = ''
                 k = k + packet_length
                 
             else:
                 k+=1
                 
+    async def rev_meter_state(dev_sub_id, data):
+        rid = int(dev_sub_id[0], 16)
+        sbc = int(dev_sub_id[1], 16)
+
+        current_meter_type_opt = METER_TYPE_OPT[int(dev_sub_id, 16)]
+                                        
+        discovery_name = '{}_{:0>2d}_{:0>2d}'.format('meter', rid, sbc)
+                                        
+        if discovery_name not in DISCOVERY_LIST:
+            DISCOVERY_LIST.append(discovery_name)
+                                            
+            for payload_template in DISCOVERY_PAYLOAD['meter']:
+                payload = payload_template.copy()
+                # 원격 검침 항목에 맞게 속성 추가
+                payload.update(current_meter_type_opt['discovery_payload'][payload['_item_type']])
+                # 미사용 항목 제거
+                payload.pop('_item_type', None)
+
+                payload['~'] = payload['~'].format(rid, sbc)
+                payload['name'] = payload['name'].format(rid, sbc)
+                                        
+                # 장치 등록 후 DISCOVERY_DELAY초 후에 State 업데이트
+                await mqtt_discovery(payload)
+                await asyncio.sleep(DISCOVERY_DELAY)
+            
+            if 'meter_00_15' not in DISCOVERY_LIST:
+                # 검침기 일괄조회 버튼 등록
+                DISCOVERY_LIST.append('meter_00_15')
+
+                payload = METER_TYPE_OPT[0x0F]['discovery_payload']['request_button'].copy()
+                
+                # 장치 등록 후 DISCOVERY_DELAY초 후에 State 업데이트
+                await mqtt_discovery(payload)
+                await asyncio.sleep(DISCOVERY_DELAY)
+
+
+        current_num = current_meter_type_opt['current_num_format'].format(int(data[0:6], 10) / current_meter_type_opt['current_num_div'])
+        total_num = current_meter_type_opt['total_num_format'].format(int(data[6:14], 10) / current_meter_type_opt['total_num_div'])
+                                        
+        await update_state('meter', 'current', rid, sbc, current_num)
+        await update_state('meter', 'total', rid, sbc, total_num)
     
+
     # MQTT Discovery로 장치 자동 등록
     async def mqtt_discovery(payload):
         intg = payload.pop('_intg')
@@ -828,14 +1066,30 @@ def ezville_loop(config):
                     statcmd = [key, 'NULL']
 
                     #EVEVATOR_CALL_DELAY초 간격으로 EVEVATOR_CALL_CNT회 전송하도록 수정 yh
-                    for rid in range(1, EVEVATOR_CALL_CNT+1):
+                    if eldown_state == '1'
+                        for rid in range(1, EVEVATOR_CALL_CNT+1):
+                            await CMD_QUEUE.put({'sendcmd': sendcmd, 'recvcmd': recvcmd, 'statcmd': statcmd})
+                        
+                            if debug:
+                                log('[DEBUG] Queued ::: sendcmd: {}, recvcmd: {}, statcmd: {}'.format(sendcmd, recvcmd, statcmd))
+                            await asyncio.sleep(EVEVATOR_CALL_DELAY)
+                    else                    
                         await CMD_QUEUE.put({'sendcmd': sendcmd, 'recvcmd': recvcmd, 'statcmd': statcmd})
-                    
                         if debug:
                             log('[DEBUG] Queued ::: sendcmd: {}, recvcmd: {}, statcmd: {}'.format(sendcmd, recvcmd, statcmd))
-                        await asyncio.sleep(EVEVATOR_CALL_DELAY)
   
+                elif device == 'meter':
+                    sendcmd = checksum('F7' + RS485_DEVICE[device]['press']['id'] + '0' + f'{sid:X}' + RS485_DEVICE[device]['press']['cmd'] + '00' + '0000')
+                    # 검침 요청은 ACK 없이 바로 상태값 전달
+                    recvcmd = 'NULL'
+                    statcmd = [key, 'NULL']
+                        
+                    await CMD_QUEUE.put({'sendcmd': sendcmd, 'recvcmd': recvcmd, 'statcmd': statcmd})
+                               
+                    if debug:
+                        log('[DEBUG] Queued ::: sendcmd: {}, recvcmd: {}, statcmd: {}'.format(sendcmd, recvcmd, statcmd))
                                                 
+
     # HA에서 전달된 명령을 EW11 패킷으로 전송
     async def send_to_ew11(send_data):
             
