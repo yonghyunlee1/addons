@@ -48,7 +48,7 @@ RS485_DEVICE = {
         'state':    { 'id': '33', 'cmd': '81' },
 
         'press':    { 'id': '33', 'cmd': '41', 'ack': 'C1' }
-    }
+    },
     'meter': {
         'state':    { 'id': '30', 'cmd': '81' },
         'press':    { 'id': '30', 'cmd': '01'}
