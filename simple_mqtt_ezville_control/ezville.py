@@ -1066,14 +1066,14 @@ def ezville_loop(config):
                     statcmd = [key, 'NULL']
 
                     #EVEVATOR_CALL_DELAY초 간격으로 EVEVATOR_CALL_CNT회 전송하도록 수정 yh
-                    if eldown_state == '1'
+                    if eldown_state == '1':
                         for rid in range(1, EVEVATOR_CALL_CNT+1):
                             await CMD_QUEUE.put({'sendcmd': sendcmd, 'recvcmd': recvcmd, 'statcmd': statcmd})
                         
                             if debug:
                                 log('[DEBUG] Queued ::: sendcmd: {}, recvcmd: {}, statcmd: {}'.format(sendcmd, recvcmd, statcmd))
                             await asyncio.sleep(EVEVATOR_CALL_DELAY)
-                    else                    
+                    else:                    
                         await CMD_QUEUE.put({'sendcmd': sendcmd, 'recvcmd': recvcmd, 'statcmd': statcmd})
                         if debug:
                             log('[DEBUG] Queued ::: sendcmd: {}, recvcmd: {}, statcmd: {}'.format(sendcmd, recvcmd, statcmd))
