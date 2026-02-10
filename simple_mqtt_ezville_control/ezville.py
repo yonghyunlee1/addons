@@ -824,11 +824,12 @@ def ezville_loop(config):
                                             dev_sub_id = '0' + str(meter_type_idx)
                                             data = packet[10 + ((meter_type_idx - 1) * 14): 10 + (meter_type_idx * 14)]
                                             await rev_meter_state(dev_sub_id, data)
+                                            await asyncio.sleep(DISCOVERY_DELAY)
 
                                     else:
                                         # 데이터 순서 - 에러상태: 1자리, 순시치: 3자리, 누적량: 4자리 
                                         await rev_meter_state(packet[4:6], packet[12:26])
-                                    
+                                        
                                     # 직전 처리 State 패킷은 저장
                                     MSG_CACHE[packet[0:10]] = packet[10:]
                 
