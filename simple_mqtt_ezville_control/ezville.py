@@ -815,6 +815,7 @@ def ezville_loop(config):
                                     MSG_CACHE[packet[0:10]] = packet[10:]
 
                                 elif name == 'meter' and STATE_PACKET:
+                                    log('[SIGNAL] receved: {}'.format(raw_data))
                                     # 원격 검침
                                     if packet[4:6] == '0F':
                                         # 전체 검침 상태 응답 (모든 검침기 상태 포함 - 수도, 가스, 전기, 온수, 열량 순))
@@ -824,7 +825,6 @@ def ezville_loop(config):
                                             dev_sub_id = '0' + str(meter_type_idx)
                                             data = packet[10 + ((meter_type_idx - 1) * 14): 10 + (meter_type_idx * 14)]
                                             await rev_meter_state(dev_sub_id, data)
-                                            await asyncio.sleep(DISCOVERY_DELAY)
 
                                     else:
                                         # 데이터 순서 - 에러상태: 1자리, 순시치: 3자리, 누적량: 4자리 
