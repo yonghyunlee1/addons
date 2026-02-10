@@ -364,6 +364,9 @@ HA_TOPIC = 'ezville'
 STATE_TOPIC = HA_TOPIC + '/{}/{}/state'
 EW11_TOPIC = 'ew11'
 EW11_SEND_TOPIC = EW11_TOPIC + '/send'
+EW11_1_SEND_TOPIC = EW11_TOPIC + '_1/send'
+EW11_2_SEND_TOPIC = EW11_TOPIC + '_2/send'
+EW11_3_SEND_TOPIC = EW11_TOPIC + '_3/send'
 
 
 # Main Function
@@ -1020,10 +1023,12 @@ def ezville_loop(config):
                     recvcmd = 'F7' + RS485_DEVICE[device]['power']['id'] +  str(idx) + str(sid) + RS485_DEVICE[device]['power']['ack']
                     statcmd = [key, value]
                         
-                    await CMD_QUEUE.put({'sendcmd': sendcmd, 'recvcmd': recvcmd, 'statcmd': statcmd})
+# asis              await CMD_QUEUE.put({'sendcmd': sendcmd, 'recvcmd': recvcmd, 'statcmd': statcmd})
+                    await CMD_QUEUE.put({'sendcmd': sendcmd, 'recvcmd': recvcmd, 'statcmd': statcmd, 'ew11no':'ew11_2'})
                                
                     if debug:
-                        log('[DEBUG] Queued ::: sendcmd: {}, recvcmd: {}, statcmd: {}'.format(sendcmd, recvcmd, statcmd))
+# asis                  log('[DEBUG] Queued ::: sendcmd: {}, recvcmd: {}, statcmd: {}'.format(sendcmd, recvcmd, statcmd))
+                        log('[DEBUG] Queued ::: sendcmd: {}, recvcmd: {}, statcmd: {}'.format(sendcmd, recvcmd, statcmd, ew11no))
                                 
                 elif device == 'gasvalve':
                     # 가스 밸브는 ON 제어를 받지 않음
@@ -1098,7 +1103,10 @@ def ezville_loop(config):
                 log('[SIGNAL] 신호 전송: {}'.format(send_data))
                         
             if comm_mode == 'mqtt':
-                mqtt_client.publish(EW11_SEND_TOPIC, bytes.fromhex(send_data['sendcmd']))
+                if send_data['ew11no'] == 'ew11_2':
+                    mqtt_client.publish(EW11_2_SEND_TOPIC, bytes.fromhex(send_data['sendcmd']))
+                else:
+                    mqtt_client.publish(EW11_SEND_TOPIC, bytes.fromhex(send_data['sendcmd']))
             else:
                 nonlocal soc
                 try:
