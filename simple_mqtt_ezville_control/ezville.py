@@ -1113,7 +1113,9 @@ def ezville_loop(config):
             log('[TESTTEST] 신호 전송: {}'.format(send_data))            
             if comm_mode == 'mqtt':
                 if send_data['ew11no'] == 'ew11_1':
+                    log('[TESTTEST] 1-1')
                     mqtt_client.publish(EW11_1_SEND_TOPIC, bytes.fromhex(send_data['sendcmd']))
+                    log('[TESTTEST] 1-2')
                 elif send_data['ew11no'] == 'ew11_2':
                     mqtt_client.publish(EW11_2_SEND_TOPIC, bytes.fromhex(send_data['sendcmd']))
                 elif send_data['ew11no'] == 'ew11_3':
