@@ -1028,7 +1028,7 @@ def ezville_loop(config):
                                
                     if debug:
 # asis                  log('[DEBUG] Queued ::: sendcmd: {}, recvcmd: {}, statcmd: {}'.format(sendcmd, recvcmd, statcmd))
-                        log('[DEBUG] Queued ::: sendcmd: {}, recvcmd: {}, statcmd: {}, ew11no: {}'.format(sendcmd, recvcmd, statcmd, ew11no))
+                        log('[DEBUG] Queued ::: sendcmd: {}, recvcmd: {}, statcmd: {}, ew11no: {}'.format(sendcmd, recvcmd, statcmd, 'ew11_2'))
                                 
                 elif device == 'gasvalve':
                     # 가스 밸브는 ON 제어를 받지 않음
