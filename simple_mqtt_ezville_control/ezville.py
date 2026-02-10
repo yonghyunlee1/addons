@@ -1110,7 +1110,7 @@ def ezville_loop(config):
         for i in range(CMD_RETRY_COUNT):
             if ew11_log:
                 log('[SIGNAL] 신호 전송: {}'.format(send_data))
-                        
+            log('[TESTTEST] 신호 전송: {}'.format(send_data))            
             if comm_mode == 'mqtt':
                 if send_data['ew11no'] == 'ew11_1':
                     mqtt_client.publish(EW11_1_SEND_TOPIC, bytes.fromhex(send_data['sendcmd']))
@@ -1125,10 +1125,15 @@ def ezville_loop(config):
             else:
                 nonlocal soc
                 try:
+                    log('[TESTTEST] 1')
                     soc.sendall(bytes.fromhex(send_data['sendcmd']))
+                    log('[TESTTEST] 2')
                 except OSError:
+                    log('[TESTTEST] 3')
                     soc.close()
+                    log('[TESTTEST] 4')
                     soc = initiate_socket(soc)
+                    log('[TESTTEST] 5')
                     soc.sendall(bytes.fromhex(send_data['sendcmd']))
             if debug:                     
                 log('[DEBUG] Iter. No.: ' + str(i + 1) + ', Target: ' + send_data['statcmd'][1] + ', Current: ' + DEVICE_STATE.get(send_data['statcmd'][0]))
