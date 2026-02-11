@@ -1353,7 +1353,8 @@ def ezville_loop(config):
         
         # socket 통신 시작       
         if comm_mode == 'mixed' or comm_mode == 'socket':
-            soc = initiate_socket()  
+            soc = initiate_socket()
+        soc = initiate_socket() #yh
 
         log('[INFO] 장치 등록 및 상태 업데이트를 시작합니다')
 
