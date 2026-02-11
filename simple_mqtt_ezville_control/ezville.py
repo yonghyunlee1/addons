@@ -1126,10 +1126,13 @@ def ezville_loop(config):
                     return
             else:
                 nonlocal soc
+                soc.settimeout(5.0)        
                 try:
                     log('[TESTTEST] 1')
                     soc.sendall(bytes.fromhex(send_data['sendcmd']))
                     log('[TESTTEST] 2')
+                except socket.timeout:
+                    log('sendall timeout 발생')
                 except OSError:
                     log('[TESTTEST] 3')
                     soc.close()
@@ -1355,6 +1358,7 @@ def ezville_loop(config):
         # socket 통신 시작       
         if comm_mode == 'mixed' or comm_mode == 'socket':
             soc = initiate_socket()
+        soc = initiate_socket() #yhyh
 
         log('[INFO] 장치 등록 및 상태 업데이트를 시작합니다')
 
