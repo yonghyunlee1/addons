@@ -1287,7 +1287,9 @@ def ezville_loop(config):
         while True:
             if not CMD_QUEUE.empty():
                 send_data = await CMD_QUEUE.get()
+                log('[TESTTEST] before send_to_ew11')
                 await send_to_ew11(send_data)               
+                log('[TESTTEST] after send_to_ew11')
             
             # COMMAND_LOOP_DELAY 초 대기 후 루프 진행
             await asyncio.sleep(COMMAND_LOOP_DELAY)    
