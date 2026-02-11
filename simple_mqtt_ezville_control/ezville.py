@@ -1130,6 +1130,7 @@ def ezville_loop(config):
                 try:
                     log('[TESTTEST] 1')
                     soc.sendall(bytes.fromhex(send_data['sendcmd']))
+                    return
                     log('[TESTTEST] 2')
                 except socket.timeout:
                     log('sendall timeout 발생')
