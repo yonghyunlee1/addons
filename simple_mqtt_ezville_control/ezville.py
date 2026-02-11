@@ -1112,38 +1112,31 @@ def ezville_loop(config):
                 log('[SIGNAL] 신호 전송: {}'.format(send_data))        
             if comm_mode == 'mqtt':
                 if send_data['ew11no'] == 'ew11_1':
-                    log('[TESTTEST] 1-1')
-                    mqtt_client.publish(EW11_1_SEND_TOPIC, bytes.fromhex(send_data['sendcmd']))
-                    log('[TESTTEST] 1-2')
                     if send_data['statcmd'][0].startswith('meter'):
                         log('[TESTTEST] 1-3')
+                        for ix in range(5)
+                            mqtt_client.publish(EW11_1_SEND_TOPIC, bytes.fromhex(send_data['sendcmd']))
+                            log('[DEBUG] Iter. No.: ' + str(ix + 1) + ', Target: ' + send_data['statcmd'][1] + ', Current: ' + DEVICE_STATE.get(send_data['statcmd'][0]))
+                            await asyncio.sleep(CMD_INTERVAL)
                         return
                         log('[TESTTEST] 1-4')
+                    else:
+                        mqtt_client.publish(EW11_1_SEND_TOPIC, bytes.fromhex(send_data['sendcmd']))
                 elif send_data['ew11no'] == 'ew11_2':
                     mqtt_client.publish(EW11_2_SEND_TOPIC, bytes.fromhex(send_data['sendcmd']))
                 elif send_data['ew11no'] == 'ew11_3':
                     mqtt_client.publish(EW11_3_SEND_TOPIC, bytes.fromhex(send_data['sendcmd']))
                 else:
-                    #asis mqtt_client.publish(EW11_SEND_TOPIC, bytes.fromhex(send_data['sendcmd']))
                     log('[DEBUG] ew11 노드 미지정 오류 ..')
                     return
             else:
                 nonlocal soc
-                soc.settimeout(5.0)        
                 try:
-                    log('[TESTTEST] 1')
                     soc.sendall(bytes.fromhex(send_data['sendcmd']))
-                    log('[TESTTEST] 2')
-                except socket.timeout:
-                    log('sendall timeout 발생')
                 except OSError:
-                    log('[TESTTEST] 3')
                     soc.close()
-                    log('[TESTTEST] 4')
                     soc = initiate_socket(soc)
-                    log('[TESTTEST] 5')
                     soc.sendall(bytes.fromhex(send_data['sendcmd']))
-                    log('[TESTTEST] 6')
             if debug:                     
                 log('[DEBUG] Iter. No.: ' + str(i + 1) + ', Target: ' + send_data['statcmd'][1] + ', Current: ' + DEVICE_STATE.get(send_data['statcmd'][0]))
              
@@ -1363,7 +1356,6 @@ def ezville_loop(config):
         # socket 통신 시작       
         if comm_mode == 'mixed' or comm_mode == 'socket':
             soc = initiate_socket()
-        soc = initiate_socket() #yhyh
 
         log('[INFO] 장치 등록 및 상태 업데이트를 시작합니다')
 
