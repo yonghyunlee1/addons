@@ -1114,7 +1114,7 @@ def ezville_loop(config):
                 if send_data['ew11no'] == 'ew11_1':
                     if send_data['statcmd'][0].startswith('meter'):
                         log('[TESTTEST] 1-3')
-                        for ix in range(5)
+                        for ix in range(5):
                             mqtt_client.publish(EW11_1_SEND_TOPIC, bytes.fromhex(send_data['sendcmd']))
                             log('[DEBUG] Iter. No.: ' + str(ix + 1) + ', Target: ' + send_data['statcmd'][1] + ', Current: ' + DEVICE_STATE.get(send_data['statcmd'][0]))
                             await asyncio.sleep(CMD_INTERVAL)
