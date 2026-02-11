@@ -1109,13 +1109,16 @@ def ezville_loop(config):
             
         for i in range(CMD_RETRY_COUNT):
             if ew11_log:
-                log('[SIGNAL] 신호 전송: {}'.format(send_data))
-            log('[TESTTEST] 신호 전송: {}'.format(send_data))            
-            if comm_mode == 'mqtt' and not send_data['statcmd'][0].startswith('meter'):
+                log('[SIGNAL] 신호 전송: {}'.format(send_data))        
+            if comm_mode == 'mqtt':
                 if send_data['ew11no'] == 'ew11_1':
                     log('[TESTTEST] 1-1')
                     mqtt_client.publish(EW11_1_SEND_TOPIC, bytes.fromhex(send_data['sendcmd']))
                     log('[TESTTEST] 1-2')
+                    if send_data['statcmd'][0].startswith('meter'):
+                        log('[TESTTEST] 1-3')
+                        return
+                        log('[TESTTEST] 1-4')
                 elif send_data['ew11no'] == 'ew11_2':
                     mqtt_client.publish(EW11_2_SEND_TOPIC, bytes.fromhex(send_data['sendcmd']))
                 elif send_data['ew11no'] == 'ew11_3':
@@ -1130,7 +1133,6 @@ def ezville_loop(config):
                 try:
                     log('[TESTTEST] 1')
                     soc.sendall(bytes.fromhex(send_data['sendcmd']))
-                    return
                     log('[TESTTEST] 2')
                 except socket.timeout:
                     log('sendall timeout 발생')
