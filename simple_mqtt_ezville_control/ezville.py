@@ -815,7 +815,6 @@ def ezville_loop(config):
                                     MSG_CACHE[packet[0:10]] = packet[10:]
 
                                 elif name == 'meter' and STATE_PACKET:
-                                    log('[SIGNAL] receved: {}'.format(raw_data))
                                     # 원격 검침
                                     if packet[4:6] == '0F':
                                         # 전체 검침 상태 응답 (모든 검침기 상태 포함 - 수도, 가스, 전기, 온수, 열량 순))
@@ -1112,7 +1111,7 @@ def ezville_loop(config):
             if ew11_log:
                 log('[SIGNAL] 신호 전송: {}'.format(send_data))
             log('[TESTTEST] 신호 전송: {}'.format(send_data))            
-            if comm_mode == 'mqtt':
+            if comm_mode == 'mqtt' and not send_data['statcmd'][0].startswith('meter'):
                 if send_data['ew11no'] == 'ew11_1':
                     log('[TESTTEST] 1-1')
                     mqtt_client.publish(EW11_1_SEND_TOPIC, bytes.fromhex(send_data['sendcmd']))
