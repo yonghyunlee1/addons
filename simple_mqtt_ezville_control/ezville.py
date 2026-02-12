@@ -1099,11 +1099,14 @@ def ezville_loop(config):
                     statcmd = [key, 'NULL']
                         
                     #await CMD_QUEUE.put({'sendcmd': sendcmd, 'recvcmd': recvcmd, 'statcmd': statcmd, 'ew11no':'ew11_1'})
-                    mqtt_client.publish(EW11_1_SEND_TOPIC, bytes.fromhex(send_data['sendcmd']))
-                               
+                    await send_meter_request(sendcmd)
+                    
                     if debug:
                         log('[DEBUG] Queued ::: sendcmd: {}, recvcmd: {}, statcmd: {}, ew11no: {}'.format(sendcmd, recvcmd, statcmd, 'ew11_1'))
                                                 
+    async def send_meter_request(sendcmd):
+        mqtt_client.publish(EW11_1_SEND_TOPIC, bytes.fromhex(sendcmd))
+        return
 
     # HA에서 전달된 명령을 EW11 패킷으로 전송
     async def send_to_ew11(send_data):
