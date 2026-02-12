@@ -1101,7 +1101,7 @@ def ezville_loop(config):
                     #await CMD_QUEUE.put({'sendcmd': sendcmd, 'recvcmd': recvcmd, 'statcmd': statcmd, 'ew11no':'ew11_1'})
                     for ix in range(1):
                         await send_meter_request(sendcmd)
-                        log('[DEBUG] Iter. No.: ' + str(ix + 1) + ', Target: ' + 'NULL' + ', Current: ' + DEVICE_STATE.get(key))
+                        log('[DEBUG] Iter. No.: ' + str(ix + 1))
                     
                     if debug:
                         log('[DEBUG] Queued ::: sendcmd: {}, recvcmd: {}, statcmd: {}, ew11no: {}'.format(sendcmd, recvcmd, statcmd, 'ew11_1'))
