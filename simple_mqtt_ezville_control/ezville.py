@@ -1099,7 +1099,9 @@ def ezville_loop(config):
                     statcmd = [key, 'NULL']
                         
                     #await CMD_QUEUE.put({'sendcmd': sendcmd, 'recvcmd': recvcmd, 'statcmd': statcmd, 'ew11no':'ew11_1'})
-                    await send_meter_request(sendcmd)
+                    for ix in range(1):
+                        await send_meter_request(sendcmd)
+                        log('[DEBUG] Iter. No.: ' + str(ix + 1) + ', Target: ' + 'NULL' + ', Current: ' + DEVICE_STATE.get(key))
                     
                     if debug:
                         log('[DEBUG] Queued ::: sendcmd: {}, recvcmd: {}, statcmd: {}, ew11no: {}'.format(sendcmd, recvcmd, statcmd, 'ew11_1'))
@@ -1116,12 +1118,7 @@ def ezville_loop(config):
                 log('[SIGNAL] 신호 전송: {}'.format(send_data))        
             if comm_mode == 'mqtt':
                 if send_data['ew11no'] == 'ew11_1':
-                    if send_data['statcmd'][0].startswith('meter'):
-                        #mqtt_client.publish(EW11_1_SEND_TOPIC, bytes.fromhex(send_data['sendcmd']))
-                        #log('[DEBUG] Iter. No.: ' + str(ix + 1) + ', Target: ' + send_data['statcmd'][1] + ', Current: ' + DEVICE_STATE.get(send_data['statcmd'][0]))
-                        return
-                    else:
-                        mqtt_client.publish(EW11_1_SEND_TOPIC, bytes.fromhex(send_data['sendcmd']))
+                    mqtt_client.publish(EW11_1_SEND_TOPIC, bytes.fromhex(send_data['sendcmd']))
                 elif send_data['ew11no'] == 'ew11_2':
                     mqtt_client.publish(EW11_2_SEND_TOPIC, bytes.fromhex(send_data['sendcmd']))
                 elif send_data['ew11no'] == 'ew11_3':
