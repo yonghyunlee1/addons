@@ -1099,9 +1099,9 @@ def ezville_loop(config):
                     statcmd = [key, 'NULL']
                         
                     #await CMD_QUEUE.put({'sendcmd': sendcmd, 'recvcmd': recvcmd, 'statcmd': statcmd, 'ew11no':'ew11_1'})
-                    for ix in range(5):
+                    for ix in range(8):
                         await send_meter_request(sendcmd)
-                        log('[DEBUG] Iter. No.: ' + str(ix + 1) + key)
+                        #log('[DEBUG] Iter. No.: ' + str(ix + 1) + ' ' + key)
                         await asyncio.sleep(CMD_INTERVAL)
                     
                     if debug:
