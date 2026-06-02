@@ -1186,8 +1186,13 @@ def ezville_loop(config):
         ew11_password = config['ew11_password']
         ew11_server = config['ew11_server']
 
-        ew11 = telnetlib.Telnet(ew11_server)
-
+        # ew11 = telnetlib.Telnet(ew11_server)
+        ew11 = telnetlib.Telnet(
+            host=ew11_server,
+            port=2323,
+            timeout=10
+        )
+        
         ew11.read_until(b'login:')
         ew11.write(ew11_id.encode('utf-8') + b'\n')
         ew11.read_until(b'password:')
