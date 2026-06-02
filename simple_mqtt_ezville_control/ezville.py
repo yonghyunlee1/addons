@@ -1196,6 +1196,7 @@ def ezville_loop(config):
         ew11.read_until(b'Restart..')
         
         log('[INFO] EW11 리셋 완료')
+        log('[DEBUG] EW11 리셋 완료')
         
         # 리셋 후 60초간 Delay
         await asyncio.sleep(60)
